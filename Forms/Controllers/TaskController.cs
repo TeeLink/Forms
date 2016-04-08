@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Forms.Models;
+using Task = Forms.Models.Task;
 
 namespace Forms.Controllers
 {
@@ -12,18 +13,41 @@ namespace Forms.Controllers
         // GET: Task
         public ActionResult Index()
         {
-            var tasks = new List<Task>();
+            
+            List<Task> currentTask;
+            currentTask = (List<Task>)Session["tasks"] ?? new List<Task>();
+
+            return View(currentTask);
+        }
+
+        [HttpGet]
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Create(Task newTask)
+        {
+            var currentTask = (List<Task>)Session["tasks"];
+            if (ModelState.IsValid)
             {
-                tasks.Add(new Task() { Name = "Nick Nemeth", Description = "Initiate Forms", IsDone = false});
-                tasks.Add(new Task() { Name = "April Lee", Description = "Update Database", IsDone = true});
-                tasks.Add(new Task() { Name = "Thaddeus Bullard", Description = "Add Help File", IsDone = true});
-                tasks.Add(new Task() { Name = "Mercedes Kaestner-Varnado", Description = "Site Mantenance", IsDone = false});
-                tasks.Add(new Task() { Name = "Christopher Lindsey", Description = "End Heartache", IsDone = true});
-                tasks.Add(new Task() { Name = "Candice Dawson", Description = "Refactor Index", IsDone = false});
-                tasks.Add(new Task() { Name = "Fred Yehi", Description = "Update Database", IsDone = true});
-                tasks.Add(new Task() { Name = "Bruno Laurer", Description = "Westman API", IsDone = true});
+                if (currentTask == null)
+                {
+                    currentTask = new List<Task>();
+                }
+
+                currentTask.Add(newTask);
+                Session["tasks"] = currentTask;
+                return RedirectToAction("Index");
             }
-            return View(tasks);
+            else
+            {
+                return View();
+            }
+
+
         }
     }
+
 }
